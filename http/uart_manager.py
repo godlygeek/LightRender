@@ -6,7 +6,7 @@ except:
 
 class UartManager:
 	def __init__(self):
-		self._uart = machine.UART(0, 300)
+		self._uart = machine.UART(0, 1200)
 		self._read_callback = None
 		self._tx_buf = b''
 		self._rx_buf = b''
