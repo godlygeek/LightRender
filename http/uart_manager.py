@@ -8,6 +8,7 @@ class UartManager:
 	def __init__(self):
 		self._uart = machine.UART(0, 1200)
 		self._read_callback = None
+		self._pending_messages = {}
 		self._tx_buf = b''
 		self._rx_buf = b''
 
@@ -15,7 +16,7 @@ class UartManager:
 		self._read_callback = read_callback
 
 	def write(self, message):
-		self._tx_buf += message
+		self._pending_messages[message[0]] = message
 		self._rx_or_tx()
 
 	def _read(self):
@@ -28,9 +29,14 @@ class UartManager:
 			self._rx_buf = b''
 
 	def _write(self):
-		self._uart.write(self._tx_buf[0:1])
-		self._tx_buf = self._tx_buf[1:]
-		if not self._tx_buf:
+		if not self._tx_buf and self._pending_messages:
+			self._tx_buf = self._pending_messages.popitem()[1]
+
+		if self._tx_buf:
+			self._uart.write(self._tx_buf[0:1])
+			self._tx_buf = self._tx_buf[1:]
+
+		if not self._tx_buf and not self._pending_messages:
 			self._rx_only()
 
 	def _handle_err_or_hup(self):
