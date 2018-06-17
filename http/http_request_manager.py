@@ -5,8 +5,10 @@ import uos as os
 class HttpRequestManager:
 	last_notify = time.ticks_ms()
 	waiters = []
+	stats = {'http_conns': 0, 'http_reqs': 0}
 
 	def __init__(self, sock, params):
+		self.stats['http_conns'] += 1
 		self._sock = sock
 		self._params = params
 		self._executor = None
@@ -286,6 +288,7 @@ class HttpRequestManager:
 			idx = new_idx
 
 	def _route_request(self):
+		self.stats['http_reqs'] += 1
 		if self._uri == b'/params':
 			if self._method == b'PUT':
 				return self._set_params()
@@ -302,6 +305,10 @@ class HttpRequestManager:
 					return self._send_response(200, b'OK', body=body)
 				except OSError:
 					return self._send_response(200, b'OK', body=b'<none>\n')
+		elif self._uri == b'/debug':
+			if self._method == b'GET':
+				body = json.dumps(self.stats)
+				return self._send_response(200, b'OK', body=body)
 		else:
 			if self._method == b'GET':
 				return self._serve_index()
