@@ -258,6 +258,7 @@ class HttpRequestManager:
 		self._request_body.extend(buf[idx:idx + length])
 
 		if self._content_length == 0:
+			self._content_length = None
 			self._route_request()
 			self._read_handler = self._parse_method
 
