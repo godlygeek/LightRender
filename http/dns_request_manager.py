@@ -20,7 +20,7 @@ class DnsRequestManager:
 		self._sock = s
 
 	def _handle_new_connection(self):
-		req, addr = self._sock.recvfrom(1456)
+		req, addr = self._sock.recvfrom(512)
 		if not 16 < len(req):
 			return  # too short
 
