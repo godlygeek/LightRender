@@ -106,6 +106,10 @@ class HttpRequestManager:
 				self._send_response(400, b'Bad Request')
 				return
 
+		if 'p' in params and 'v' not in params:
+			# Seeks are in the current video, unless we're told otherwise
+			params['v'] = self._params.V
+
 		self._params.update(params)
 		self._notify_waiters()
 		self._serve_params()
